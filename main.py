@@ -1,6 +1,9 @@
 import sys
+import os
 import win32com.client
 import itertools
+
+SUPPORTED_EXTENSIONS = ["xls", "xlsx"]
 openedDoc = win32com.client.Dispatch("Excel.Application")
 filename = "C:\\Users\\azizs\\Downloads\\ASTU.xlsx"
 
@@ -21,7 +24,23 @@ def try_open(password):
 		print("Incorrect password")
 		return False
 
+def capture_input():
+	print("\n\nWelcome to Excel Password Cracker\n\n")
+	while True:
+		print("Enter the path to the file you wish to crack:\n")
+		file_path = os.path.abspath(str(input()).replace("\"", ""))
+		if not os.path.isfile(file_path):
+			print("\nHmmm...that doesn't look like a file. Try again:\n")
+			continue
+		filename, file_extension = os.path.splitext(file_path)
+		if file_extension not in SUPPORTED_EXTENSIONS:
+			print("\nSorry, {} files are not supported. Try again:\n".format(file_extension))
+			continue
+
+
 def main():
+	capture_input()
+	return
 	for i in range(4,password_max_length+1):
 		for j in itertools.permutations(all_characters, i):
 			j = list(j)
