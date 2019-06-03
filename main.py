@@ -61,7 +61,7 @@ def _capture_input() -> Controller:
 			controller.lowercase = True
 			choice_confirmation += "Lowercase\n"
 		if "2" in char_types:
-			controller.uppsercase = True
+			controller.uppercase = True
 			choice_confirmation += "Uppercase\n"
 		if "3" in char_types:
 			controller.numbers = True
@@ -95,7 +95,7 @@ def _generate_supported_file_extensions() -> list:
 
 def main():
 	controller: Controller = _capture_input()
-	# controller.run()
+	controller.run()
 	return
 
 
