@@ -3,6 +3,10 @@ import itertools
 from time import time, sleep
 from threading import Thread
 import sys
+import multiprocessing
+from queue import Queue
+from shutil import copyfile
+import os
 
 
 class Controller:
@@ -16,9 +20,12 @@ class Controller:
         self.uppercase = False
         self.numbers = False
         self.special = False
-        self.threads = 8
+
         self.attempts_so_far = 0
         self.num_of_permutations = 0
+
+        self.password_queue = None
+        self.correct_password = None
 
     def run(self):
         # Get generator for password combinations
@@ -27,11 +34,34 @@ class Controller:
         reporter = Thread(target=self._report_progress, args=(time(),), daemon=False)
         reporter.start()
         # Create worker threads to try all combinations
+        self.password_queue = Queue()
+        thread_count = 2*multiprocessing.cpu_count()
+        for i in range(0, thread_count):
+            # make a copy
+            filename, file_extension = os.path.splitext(self.path)
+            new_path = "{}_{}".format(filename, i).join(self.path.rsplit(filename, 1))
+            copyfile(str(self.path), new_path)
+            thread = Thread(target=self._run_attack, name="thread_{}".format(i), args=(new_path,), daemon=False)
+            thread.start()
         for password in all_passwords:
-            self.attempts_so_far += 1
-            if self.type.open(path=self.path, password=password):
-                print("Success! Password is {}".format(password))
+            if self.correct_password:
+                self._cleanup()
                 break
+            self.password_queue.put(password)
+        return
+
+    def _run_attack(self, file_path):
+        while not self.correct_password:
+            if not self.password_queue.empty():
+                password = self.password_queue.get()
+                if self.type.open(path=file_path, password=password) and not self.correct_password:
+                    self.correct_password = password
+                    print("Success! Password is {}".format(password))
+                    break
+                self.attempts_so_far += 1
+
+    def _cleanup(self):
+        # delete all files
         return
 
     def _generate_password_combinations(self):
