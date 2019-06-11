@@ -8,7 +8,7 @@ class Excel:
 
     def open(self, path, password="") -> bool:
         try:
-            wb = self.OPENDOC.Workbooks.Open(path, False, True, None, password)
+            self.OPENDOC.Workbooks.Open(path, False, True, None, password)
             return True
         except:
             return False

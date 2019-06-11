@@ -47,7 +47,7 @@ def _capture_input() -> Controller:
 		pass_max_len = input(c.P_ASK_MAX_LEN)
 		try:
 			pass_max_len = int(pass_max_len)
-			if pass_max_len < 0:
+			if pass_max_len < pass_min_len:
 				raise ValueError
 			controller.pass_max_len = pass_max_len
 			break
@@ -70,10 +70,10 @@ def _capture_input() -> Controller:
 			controller.special = True
 			choice_confirmation += "Special Characters\n"
 		if choice_confirmation == "":
-			print("No character types selected. Please make a choice.\n")
+			print(c.P_NO_CHAR_TYPE_SELECTED)
 			continue
 		else:
-			print("\nYou have chosen the following character types: \n" + choice_confirmation)
+			print(c.P_CONFIRM_CHAR_TYPES + choice_confirmation)
 			break
 
 	return controller

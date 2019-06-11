@@ -1,4 +1,3 @@
-import constants as c
 import itertools
 from time import time, sleep
 from threading import Thread
@@ -7,9 +6,12 @@ import multiprocessing
 from queue import Queue
 from shutil import copyfile
 import os
+import constants as c
 
 
 class Controller:
+
+    FILE_COPY_NAME_FORMAT = "{}_{}"
 
     def __init__(self):
         self.path = None
@@ -39,16 +41,15 @@ class Controller:
         for i in range(0, thread_count):
             # make a copy
             filename, file_extension = os.path.splitext(self.path)
-            new_path = "{}_{}".format(filename, i).join(self.path.rsplit(filename, 1))
+            new_path = self.FILE_COPY_NAME_FORMAT.format(filename, i).join(self.path.rsplit(filename, 1))
             copyfile(str(self.path), new_path)
             thread = Thread(target=self._run_attack, name="thread_{}".format(i), args=(new_path,), daemon=False)
             thread.start()
         for password in all_passwords:
             if self.correct_password:
-                self._cleanup()
+                self._cleanup(thread_count)
                 break
             self.password_queue.put(password)
-        return
 
     def _run_attack(self, file_path):
         while not self.correct_password:
@@ -56,13 +57,15 @@ class Controller:
                 password = self.password_queue.get()
                 if self.type.open(path=file_path, password=password) and not self.correct_password:
                     self.correct_password = password
-                    print("Success! Password is {}".format(password))
+                    print(c.PASSWORD_SUCCESS.format(password))
                     break
                 self.attempts_so_far += 1
 
-    def _cleanup(self):
+    def _cleanup(self, thread_count, filename):
         # delete all files
-        return
+        for i in range(0, thread_count):
+            file_to_delete = self.FILE_COPY_NAME_FORMAT.format(filename, i).join(self.path.rsplit(filename, 1))
+            os.remove(file_to_delete)
 
     def _generate_password_combinations(self):
         all_characters = []
@@ -76,10 +79,9 @@ class Controller:
             all_characters.extend(c.numbers)
 
         num_of_chars = len(all_characters)
-        num_of_permutations = 0
         for r in range(0, num_of_chars+1):
             self.num_of_permutations += pow(num_of_chars, r)
-        print("There are {:.2e} possible passwords\n".format(self.num_of_permutations))
+        print(c.TOTAL_PERM.format(self.num_of_permutations))
 
         for i in range(self.pass_min_len, self.pass_max_len + 1):
             for j in itertools.product(all_characters, repeat=i):
@@ -93,22 +95,21 @@ class Controller:
         while self.attempts_so_far != self.num_of_permutations:
             rate = (time()-start_time)/self.attempts_so_far
             eta = rate*(self.num_of_permutations-self.attempts_so_far)
-            sys.stdout.write("\r{} passwords tried so far. Estimated time remaining is {}"
-                             .format(self.attempts_so_far, self._sec_to_human_format(eta)))
+            sys.stdout.write(c.PROGRESS_REPORT.format(self.attempts_so_far, self._sec_to_human_format(eta)))
             sys.stdout.flush()
             sleep(1)
 
     def _sec_to_human_format(self, seconds):
         if seconds < 60:
-            return "{}s".format(seconds)
+            return "{}s".format(int(seconds))
         mins, seconds = divmod(seconds, 60)
         if mins < 60:
-            return "{}m {}s".format(mins, seconds)
+            return "{}m {}s".format(int(mins), int(seconds))
         hours, mins = divmod(mins, 60)
         if hours < 24:
-            return "{}h {}m".format(hours, mins)
+            return "{}h {}m".format(int(hours), int(mins))
         days, hours = divmod(hours, 24)
         if days < 365:
-            return "{}days {}h".format(days, hours)
+            return "{}days {}h".format(int(days), int(hours))
         years, days = divmod(days, 365)
-        return "{}years {}days".format(years, days)
+        return "{}years {}days".format(years, int(days))

@@ -28,3 +28,10 @@ P_CHAR_TYPES = "What type of characters does your password contain? Enter the co
                "3. Numbers\n" \
                "4. Special Characters and symbols\n\n" \
                "For example, for lowercase and number characters enter 1,3\n"
+P_NO_CHAR_TYPE_SELECTED = "No character types selected. Please make a choice.\n"
+P_CONFIRM_CHAR_TYPES = "\nYou have chosen the following character types: \n"
+
+# Attack
+TOTAL_PERM = "There are {:.2e} possible passwords\n"
+PROGRESS_REPORT = "\r{} passwords tried so far. Estimated time remaining is {}"
+PASSWORD_SUCCESS = "Success! Password is {}"
