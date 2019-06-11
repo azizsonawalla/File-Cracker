@@ -11,7 +11,9 @@ Then follow the on-screen prompts to provide information about your file
 
 ## How it works
 <br>
-<img src="docs/diagram.jpg" width="60%" align="center">
+<p align="center">
+<img src="docs/diagram.jpg" width="60%">
+</p>
 <br>
 
 ### Multi-threaded script with thread pooling
