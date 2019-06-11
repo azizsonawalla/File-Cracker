@@ -10,6 +10,7 @@ python main.py
 Then follow the on-screen prompts to provide information about your file
 
 ## How it works
+![diagram](docs/diagram.jpg)
 ### Multi-threaded script with thread pooling
 File Cracker creates twice the number of threads as your CPU core count and pools them for unbeatable performance. Password combinations are fed into a shared thread-safe queue and picked-up by the first available thread. 
 
