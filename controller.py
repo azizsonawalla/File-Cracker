@@ -79,7 +79,7 @@ class Controller:
             all_characters.extend(c.numbers)
 
         num_of_chars = len(all_characters)
-        for r in range(0, num_of_chars+1):
+        for r in range(self.pass_min_len, self.pass_max_len+1):
             self.num_of_permutations += pow(num_of_chars, r)
         print(c.TOTAL_PERM.format(self.num_of_permutations))
 
